@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Quotes!</title>
+    <style media="screen">
+    .header{
+      text-align: right;
+    }
+    .side{
+      width: 45%;
+      display: inline-block;
+    }
+      .error{
+        color:red;
+      }
+      .section{
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 10%;
+      }
+      .quote{
+        border: 1px black solid
+      }
+      button{
+        margin-left: 80%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+    <a href="/logout">Logout</a>
+    </div>
+    <h1>Hello, {{request.session.theuser}}</h1>
+    <div class="side">
+      <h3>Quoteable Quotes</h3>
+      <div class="quotes" style="overflow:scroll; height:400px;">
+        {%for quote in all %}
+        <div class="quote">
+          <p>{{quote.author}}: {{quote.quote}}</p>
+          <form class="fav" action="/favorite/{{quote.id}}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="userid" value="{{request.session.userid}}">
+            <input type="submit" name="" value="Add to My List">
+          </form>
+          <i>Postedby: <a href="/user/{{quote.posted.id}}">{{quote.posted.name}}</a></i>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="side">
+      <div class="favorites">
+        <h3>Your Favorites</h3>
+        <div class="quotes" style="overflow:scroll; height:400px;">
+          {%for quote in fav %}
+          <div class="quote">
+            <p>{{quote.author}}: {{quote.quote}}{{quote.posted}}</p>
+            <form class="fav" action="/unfavorite/{{quote.id}}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="userid" value="{{request.session.userid}}">
+              <input type="submit" name="" value="Remove From My List">
+            </form>
+          <i>Postedby: <a href="/user/{{quote.posted.id}}">{{quote.posted.name}}</a></i>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="form">
+        <h3>Conribute a Quote</h3>
+        <form class="add" action="/addquote" method="post">
+          {% csrf_token %}
+          Quoted By: <input type="text" name="author" value="">
+          Message: <textarea name="quote" rows="8" cols="80"></textarea>
+          <input type="hidden" name="userid" value="{{request.session.userid}}">
+          <input type="submit" name="" value="Submit">
+        </form>
+          {% if messages %}
+            {% for message in messages %}
+              <p class="{{message.tags}}">{{message}}</p>
+            {% endfor %}
+          {% endif %}
+      </div>
+    </div>
+  </body>
+</html>
